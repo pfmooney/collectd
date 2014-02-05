@@ -743,9 +743,11 @@ static int disk_read (void)
 					read_merged, write_merged);
 		} /* if (is_disk) */
 
+#if HAVE_LIBUDEV
 		/* free udev-based name buffer if needed */
 		if (alt_name != NULL)
 			free(alt_name);
+#endif
 	} /* while (fgets (buffer, sizeof (buffer), fh) != NULL) */
 
 #if HAVE_LIBUDEV
