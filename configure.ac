@@ -4066,8 +4066,8 @@ AM_CONDITIONAL(BUILD_WITH_LIBTOKYOTYRANT, test "x$with_libtokyotyrant" = "xyes")
 # }}}
 
 # --with-libudev {{{
-with_udev_cflags=""
-with_udev_ldflags=""
+with_libudev_cflags=""
+with_libudev_ldflags=""
 AC_ARG_WITH(libudev, [AS_HELP_STRING([--with-libudev@<:@=PREFIX@:>@], [Path to libudev.])],
 [
 	if test "x$withval" = "xno"
@@ -4077,8 +4077,8 @@ AC_ARG_WITH(libudev, [AS_HELP_STRING([--with-libudev@<:@=PREFIX@:>@], [Path to l
 		with_libudev="yes"
 		if test "x$withval" != "xyes"
 		then
-			with_udev_cflags="-I$withval/include"
-			with_udev_ldflags="-L$withval/lib"
+			with_libudev_cflags="-I$withval/include"
+			with_libudev_ldflags="-L$withval/lib"
 			with_libudev="yes"
 		fi
 	fi
@@ -4094,7 +4094,7 @@ AC_ARG_WITH(libudev, [AS_HELP_STRING([--with-libudev@<:@=PREFIX@:>@], [Path to l
 if test "x$with_libudev" = "xyes"
 then
 	SAVE_CPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="$CPPFLAGS $with_udev_cflags"
+	CPPFLAGS="$CPPFLAGS $with_libudev_cflags"
 
 	AC_CHECK_HEADERS(libudev.h, [], [with_libudev="no (libudev.h not found)"])
 
@@ -4104,8 +4104,8 @@ if test "x$with_libudev" = "xyes"
 then
 	SAVE_CPPFLAGS="$CPPFLAGS"
 	SAVE_LDFLAGS="$LDFLAGS"
-	CPPFLAGS="$CPPFLAGS $with_udev_cflags"
-	LDFLAGS="$LDFLAGS $with_udev_ldflags"
+	CPPFLAGS="$CPPFLAGS $with_libudev_cflags"
+	LDFLAGS="$LDFLAGS $with_libudev_ldflags"
 
 	AC_CHECK_LIB(udev, udev_new,
 	[
@@ -4118,12 +4118,12 @@ then
 fi
 if test "x$with_libudev" = "xyes"
 then
-	BUILD_WITH_LIBSENSORS_CFLAGS="$with_udev_cflags"
-	BUILD_WITH_LIBSENSORS_LDFLAGS="$with_udev_ldflags"
-	AC_SUBST(BUILD_WITH_LIBSENSORS_CFLAGS)
-	AC_SUBST(BUILD_WITH_LIBSENSORS_LDFLAGS)
+	BUILD_WITH_LIBUDEV_CFLAGS="$with_libudev_cflags"
+	BUILD_WITH_LIBUDEV_LDFLAGS="$with_libudev_ldflags"
+	AC_SUBST(BUILD_WITH_LIBUDEV_CFLAGS)
+	AC_SUBST(BUILD_WITH_LIBUDEV_LDFLAGS)
 fi
-AM_CONDITIONAL(BUILD_WITH_LM_SENSORS, test "x$with_libudev" = "xyes")
+AM_CONDITIONAL(BUILD_WITH_LIBUDEV, test "x$with_libudev" = "xyes")
 # }}}
 
 # --with-libupsclient {{{
