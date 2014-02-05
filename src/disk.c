@@ -564,7 +564,7 @@ static int disk_read (void)
 	{
 		char *disk_name;
 		char *output_name;
-		char *alt_name = NULL;
+		char *alt_name;
 
 		numfields = strsplit (buffer, fields, 32);
 
@@ -721,9 +721,11 @@ static int disk_read (void)
 #if HAVE_LIBUDEV
 		alt_name = disk_udev_attr_name (handle_udev, disk_name,
 				conf_udev_name_attr);
+#else
+		alt_name = NULL;
+#endif
 		if (alt_name != NULL)
 			output_name = alt_name;
-#endif
 
 		if ((ds->read_bytes != 0) || (ds->write_bytes != 0))
 			disk_submit (output_name, "disk_octets",
@@ -743,10 +745,8 @@ static int disk_read (void)
 					read_merged, write_merged);
 		} /* if (is_disk) */
 
-#if HAVE_LIBUDEV
 		/* release udev-based alternate name, if allocated */
 		free(alt_name);
-#endif
 	} /* while (fgets (buffer, sizeof (buffer), fh) != NULL) */
 
 #if HAVE_LIBUDEV
