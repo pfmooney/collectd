@@ -185,7 +185,7 @@ static int disk_config (const char *key, const char *value)
       return (1);
 #else
     WARNING ("disk plugin: The \"UdevNameAttr\" option is only supported "
-        "if collectd is build with libudev support");
+        "if collectd is built with libudev support");
 #endif
   }
   else
@@ -287,7 +287,7 @@ static counter_t disk_calc_time_incr (counter_t delta_time, counter_t delta_ops)
  * Attempt to provide an rename disk instance from an assigned udev attribute.
  *
  * On success, it returns a strduped char* to the desired attribute value.
- * Otherwise it returns *disk_name
+ * Otherwise it returns NULL.
  */
 
 static char *disk_udev_attr_name (struct udev *udev, char *disk_name, const char *attr)
@@ -305,10 +305,6 @@ static char *disk_udev_attr_name (struct udev *udev, char *disk_name, const char
 			DEBUG ("disk plugin: renaming %s => %s", disk_name, output);
 		}
 		udev_device_unref (dev);
-	}
-	if (output == NULL)
-	{
-		output = disk_name;
 	}
 	return output;
 }
@@ -567,6 +563,7 @@ static int disk_read (void)
 	while (fgets (buffer, sizeof (buffer), fh) != NULL)
 	{
 		char *disk_name;
+		char *alt_name;
 		char *output_name;
 
 		numfields = strsplit (buffer, fields, 32);
@@ -719,11 +716,13 @@ static int disk_read (void)
 			continue;
 		}
 
-#if HAVE_LIBUDEV
-		output_name = disk_udev_attr_name (handle_udev, disk_name,
-				conf_udev_name_attr);
-#else
 		output_name = disk_name;
+#if HAVE_LIBUDEV
+		alt_name = disk_udev_attr_name (handle_udev, disk_name,
+				conf_udev_name_attr);
+		if (alt_name != NULL)
+			output_name = alt_name;
+
 #endif
 
 		if ((ds->read_bytes != 0) || (ds->write_bytes != 0))
@@ -744,9 +743,9 @@ static int disk_read (void)
 					read_merged, write_merged);
 		} /* if (is_disk) */
 
-		/* if udev rename was successful, free-ing the strduped name is necessary */
-		if (output_name != disk_name)
-			free(output_name);
+		/* free udev-based name buffer if needed */
+		if (alt_name != NULL)
+			free(alt_name);
 	} /* while (fgets (buffer, sizeof (buffer), fh) != NULL) */
 
 #if HAVE_LIBUDEV
